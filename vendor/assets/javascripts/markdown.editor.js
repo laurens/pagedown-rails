@@ -111,6 +111,7 @@
                                                   * its own image insertion dialog, this hook should return true, and the callback should be called with the chosen
                                                   * image url (or null if the user cancelled). If this hook returns false, the default dialog will be used.
                                                   */
+        hooks.addFalse("insertCustomImageDialog");
 
         this.getConverter = function () { return markdownConverter; }
 
@@ -1249,8 +1250,11 @@
                     case "k":
                         doClick(buttons.code);
                         break;
+                    // case "g":
+                    //     doClick(buttons.image);
+                    //     break;
                     case "g":
-                        doClick(buttons.image);
+                        doClick(buttons.customImage);
                         break;
                     case "o":
                         doClick(buttons.olist);
@@ -1471,8 +1475,11 @@
             }));
             buttons.quote = makeButton("wmd-quote-button", getString("quote"), "-60px", bindCommand("doBlockquote"));
             buttons.code = makeButton("wmd-code-button", getString("code"), "-80px", bindCommand("doCode"));
-            buttons.image = makeButton("wmd-image-button", getString("image"), "-100px", bindCommand(function (chunk, postProcessing) {
-                return this.doLinkOrImage(chunk, postProcessing, true);
+            // buttons.image = makeButton("wmd-image-button", getString("image"), "-100px", bindCommand(function (chunk, postProcessing) {
+            //     return this.doLinkOrImage(chunk, postProcessing, true);
+            // }));
+            buttons.customImage = makeButton("wmd-image-button", getString("image"), "-100px", bindCommand(function (chunk, postProcessing) {
+                return this.doCustomImage(chunk, postProcessing);
             }));
             makeSpacer(2);
             buttons.olist = makeButton("wmd-olist-button", getString("olist"), "-120px", bindCommand(function (chunk, postProcessing) {
@@ -2207,6 +2214,18 @@
         chunk.startTag = "----------\n";
         chunk.selection = "";
         chunk.skipLines(2, 1, true);
+    }
+
+    commandProto.doCustomImage = function (chunk, postProcessing) {
+      imageEnteredCallback = function (url, text) {
+        chunk.startTag = '(bild: ' + url + ' text: "';
+        chunk.selection = text;
+        chunk.endTag = '")';
+        chunk.skipLines(1, 1, true);
+        postProcessing();
+      }
+
+      this.hooks.insertCustomImageDialog(imageEnteredCallback)
     }
 
 
