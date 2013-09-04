@@ -2217,8 +2217,8 @@
     }
 
     commandProto.doCustomImage = function (chunk, postProcessing) {
-      imageEnteredCallback = function (url, text) {
-        chunk.startTag = '(bild: ' + url + ' text: "';
+      imageEnteredCallback = function (url, text, type) {
+        chunk.startTag = '(' + type + ': ' + url + ' text: "';
         chunk.selection = text;
         chunk.endTag = '")';
         chunk.skipLines(1, 1, true);
